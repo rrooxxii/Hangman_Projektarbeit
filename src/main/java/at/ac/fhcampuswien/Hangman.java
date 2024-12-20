@@ -3,7 +3,7 @@ import java.util.Scanner;
 
 class Hangman {
 private String word;
-public PlayerHangman playerHangman1;
+public PlayerHangman player1;
 public PlayerHangman player2;
 public Scanner inputScanner = new Scanner(System.in);
 
@@ -32,7 +32,11 @@ public Scanner inputScanner = new Scanner(System.in);
 
 
     public void startGame(){
-
+        System.out.println("Welcome to Hangman!");
+        System.out.println("Player 1 Please enter your name: ");
+        player1.setName(inputScanner.nextLine());
+        System.out.println("Player 2 Please enter your name: ");
+        player2.setName(inputScanner.nextLine());
 
 
 
