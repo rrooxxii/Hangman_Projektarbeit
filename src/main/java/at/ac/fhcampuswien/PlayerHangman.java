@@ -2,21 +2,30 @@
 package at.ac.fhcampuswien;
 
 
+import java.util.Scanner;
 
 public class PlayerHangman {
 
-    private static int MAX_LIVES = 11;
-    int wrongGuessCount = 0;
-    public String name = null;
+    private static final int MAX_LIVES = 7;
+    private int lives = MAX_LIVES;
+    private  String name = null;
+
+//Constructor
+
+    public PlayerHangman(String name) {
+        this.setName(name);
+    }
+
 
 //Getter_Setter
 
-    public int getWrongGuessCount() {
-        return wrongGuessCount;
+
+    public static int getMaxLives() {
+        return MAX_LIVES;
     }
 
-    public void setWrongGuessCount(int wrongGuessCount) {
-        this.wrongGuessCount = wrongGuessCount;
+    public int getLives() {
+        return lives;
     }
 
     public String getName() {
@@ -27,18 +36,15 @@ public class PlayerHangman {
         this.name = name;
     }
 
-    //Methoden
+//Methoden
 
-    public boolean reduceLives (){
-
-        if (wrongGuessCount <=1){
-            wrongGuessCount = wrongGuessCount - 1;
-            return true;
+    public boolean reduceLives() {
+        if (this.lives > 0) {
+            this.lives--; // Decrement lives if above 0
+            System.out.println("Your lives remaining: " + this.lives);
+            return true; // Player still has lives
         }
-        else {
-            return false;
-        }
-
+        return false; // Player has no lives left
     }
 
 }
