@@ -18,7 +18,7 @@ public class App extends Application {
 
     public static void main(String[] args) {
         //Run Test Code for Console Version:
-        Hangman currentGame = new Hangman("ThisistheWay", "Vi", "Jinx");
+        Hangman currentGame = new Hangman("ThisistheWay", "Vi", "hard");
         currentGame.startGame();
         currentGame.playRound();
 

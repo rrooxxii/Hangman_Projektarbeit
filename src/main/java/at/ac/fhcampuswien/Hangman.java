@@ -1,27 +1,100 @@
 package at.ac.fhcampuswien;
+import java.net.URI;
 import java.util.Scanner;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.util.Random;
 
-class Hangman {
+public class Hangman {
 private PlayerHangman player1;
 private PlayerHangman player2;
 public Scanner inputScanner = new Scanner(System.in);
-private char[] puzzleArray;
-private char[] wordArray;
+private char[] puzzleArray; //current state of fields
+private char[] wordArray; //word to guess
+
 
 PlayerHangman[] playerList = new PlayerHangman[2];
-public int playerCounter = 0;
+public int playerCounter = 0; //currentplayer
 
-
+//Methode
 
 //Constructor
-    //Wir geben Wort ein es gibt fix 2 Spieler
-    public Hangman(String word, String player1Name, String player2Name) {
+    //Wir geben Wort ein es gibt fix 2 Spieler, Spiel startet
+    public Hangman(String player1Name, String player2Name, String difficulty) {
         playerList[0] = player1 = new PlayerHangman(player1Name);
         playerList[1] = player2 = new PlayerHangman(player2Name);
-        this.wordArray = word.toCharArray();
-        this.initPuzzleArray();
 
+        try {
+            //Holt ein Wort basierend auf difficulty
+            String word = fetchWordfromAPI(difficulty);
+            this.wordArray = word.toCharArray();
+            this.initPuzzleArray();
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching word from API: " + e.getMessage());
+        }
     }
+
+    //Methode um Wort von der API abzurufen
+    private String fetchWordfromAPI(String difficulty) throws Exception{
+        HttpClient client = HttpClient.newHttpClient();     //HTTP Client für API-Anfrage
+        String apiUrl = "https://random-word-api.herokuapp.com/word?number=1"; // Basis-URL ohne Längenfilter
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(new URI(apiUrl))
+                .GET()
+                .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString()); //Anfrage senden
+
+
+        if (response.statusCode() == 200) {
+            String responseBody = response.body().substring(2, response.body().length() - 2); // Entferne JSON-Array-Formatierung
+
+            // Überprüfe ob WOrt zu difficulty passt
+            if (isWordValidForDifficulty(responseBody, difficulty)) {
+                return responseBody;
+            } else {
+                System.out.println("Word does not fit difficulty. Retrying...");
+                return fetchWordfromAPI(difficulty); // Wiederhole die Anfrage
+            }
+        } else {
+            throw new RuntimeException("API request failed with status code: " + response.statusCode());
+        }
+    }
+
+    // Methode ob das Wort zur Schwierigkeit passt
+    private boolean isWordValidForDifficulty(String word, String difficulty) {
+        int length = word.length(); //Wortlänge bestimmen
+        //Wortlänge bestimmen anhand von difficulty
+        switch (difficulty.toLowerCase()) {
+            case "easy":
+                return length >= 1 && length <= 10;
+            case "medium":
+                return length >= 10 && length <= 15;
+            case "hard":
+                return length >= 15;
+            default:
+                throw new IllegalArgumentException("Invalid difficulty: " + difficulty);
+        }
+    }
+
+
+    // Hilfsmethode zum Erstellen der API-URL basierend auf dem Schwierigkeitsgrad
+    private String buildApiUrl(String difficulty) {
+        String baseUrl = "https://random-word-api.herokuapp.com/word?lang=de&number=1";
+        switch (difficulty.toLowerCase()) {
+            case "easy":
+                return baseUrl + "&minLength=1&maxLength=10"; //Wörter zwischen 1 und 10 char
+            case "medium":
+                return baseUrl + "&minLength=10&maxLength=15"; //Wörter mit 10-15 char
+            case "hard":
+                return baseUrl + "&minLength=15"; // Beispiel: Wörter mit mindestens 15 char
+            default:
+                throw new IllegalArgumentException("Ungueltiger Schwierigkeitsgrad. Waehle 'easy', 'medium' oder 'hard'.");
+        }
+    }
+
+
 
     //Wir holen uns das Wort aus einem File
     public Hangman(){
