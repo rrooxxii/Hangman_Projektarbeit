@@ -232,6 +232,62 @@ public int playerCounter = 0; //currentplayer
             }
         }
     }
+    /*Methode um Punkte zu berechnen bzw Highscore
+       Highscore Berechnung für Hangman
+        7 - 21
+        6, 5 - 18
+        4, 3 - 15
+        2, 1 - 12
+        0 - 9
 
+        Gewonnen mit 7 leben - 21pts
+        Verloren - 9pts
+        nur eine Grundbasis kann geändert werden mit einem schwierigkeitsmultiplikator
+     */
+    public int calculateScore(PlayerHangman player) { //generelle Punkte"logik"
+        if (!checkIfWon()) {
+            return 9;
+        }
+        if (player.getLives() == 7) {
+            return 21;
+        } else if (player.getLives() >= 5) {
+            return 18;
+        } else if (player.getLives() >= 3) {
+            return 15;
+        } else if (player.getLives() >= 1) {
+            return 12;
+        } else {
+            return 9;
+        }
+    }
+    public void calculateScoreAll(){ //Logik um die Punkte für alle Spieler zu berechnen
+        PlayerHangman winner = null;
+        int highestScore = Integer.MIN_VALUE;
+        boolean tie = false;
+        System.out.println("Scores ");
+        for (PlayerHangman player : playerList) {
+            int score = calculateScore(player);
+            System.out.println("Player " + player.getName() + " score is " + score);
+            if (score > highestScore) {
+                highestScore = score;
+                winner = player;
+                tie = false;
+            }else if (score == highestScore) {
+                tie = true;
+            }
+        }
+        if (tie) {
+            System.out.println("Untentschieden mit " + highestScore + " Punkten!");
+            for (PlayerHangman player : playerList) {
+                if (calculateScore(player) == highestScore) {
+                    System.out.println(player.getName());
+                }
+            }
+        } else if (winner != null) {
+            System.out.println("Der Gewinner ist " + winner.getName() + " mit " + highestScore + " Punkten!");
+        } else {
+            System.out.println("Es gibt keinen Gewinner!");
+        }
+    }
 }
 
