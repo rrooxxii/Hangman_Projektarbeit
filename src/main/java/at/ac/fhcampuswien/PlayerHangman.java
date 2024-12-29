@@ -41,7 +41,7 @@ public class PlayerHangman {
     public boolean reduceLives() {
         if (this.lives > 0) {
             this.lives--; // Decrement lives if above 0
-            System.out.println("Your lives remaining: " + this.lives);
+//            System.out.println("Your lives remaining: " + this.lives);
             return true; // Player still has lives
         }
         return false; // Player has no lives left

@@ -1,5 +1,6 @@
 package at.ac.fhcampuswien;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -7,23 +8,21 @@ import java.net.http.HttpResponse;
 import java.util.Random;
 
 public class Hangman {
-private PlayerHangman player1;
-private PlayerHangman player2;
 public Scanner inputScanner = new Scanner(System.in);
 private char[] puzzleArray; //current state of fields
 private char[] wordArray; //word to guess
+private String language = "en"; // Standard Sprache ist Englisch
 
-
-PlayerHangman[] playerList = new PlayerHangman[2];
-public int playerCounter = 0; //currentplayer
+    // Liste der Spieler, die am Spieler teilnehmen
+    private ArrayList<PlayerHangman> playerList = new ArrayList<>();
+    private int currentPlayerIndex = 0;
 
 //Methode
 
 //Constructor
     //Wir geben Wort ein es gibt fix 2 Spieler, Spiel startet
     public Hangman(String player1Name, String player2Name, String difficulty) {
-        playerList[0] = player1 = new PlayerHangman(player1Name);
-        playerList[1] = player2 = new PlayerHangman(player2Name);
+
 
         try {
             //Holt ein Wort basierend auf difficulty
@@ -31,7 +30,7 @@ public int playerCounter = 0; //currentplayer
             this.wordArray = word.toCharArray();
             this.initPuzzleArray();
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching word from API: " + e.getMessage());
+            throw new RuntimeException(language.equals("de") ? "Fehler beim Abrufen des Wortes von der API: " + e.getMessage() : "Error fetching word from API: " + e.getMessage());
         }
     }
 
@@ -54,11 +53,11 @@ public int playerCounter = 0; //currentplayer
             if (isWordValidForDifficulty(responseBody, difficulty)) {
                 return responseBody;
             } else {
-                System.out.println("Word does not fit difficulty. Retrying...");
+                System.out.println(language.equals("de") ? "Das WOrte entspricht nicht der gewählten Schwierigkeit. Neuer Versuch..." : "Word does not fit difficulty. Retrying...");
                 return fetchWordfromAPI(difficulty); // Wiederhole die Anfrage
             }
         } else {
-            throw new RuntimeException("API request failed with status code: " + response.statusCode());
+            throw new RuntimeException(language.equals("de") ? "API-Anfrage fehlgeschlagen mit Statuscode: " + response.statusCode() : "API request failed with status code: " + response.statusCode());
         }
     }
 
@@ -74,7 +73,7 @@ public int playerCounter = 0; //currentplayer
             case "hard":
                 return length >= 15;
             default:
-                throw new IllegalArgumentException("Invalid difficulty: " + difficulty);
+                throw new IllegalArgumentException(language.equals("de") ? "Ungueltiger Schwierigkeitsgrad: " + difficulty : "Invalid difficulty: " + difficulty);
         }
     }
 
@@ -90,7 +89,7 @@ public int playerCounter = 0; //currentplayer
             case "hard":
                 return baseUrl + "&minLength=15"; // Beispiel: Wörter mit mindestens 15 char
             default:
-                throw new IllegalArgumentException("Ungueltiger Schwierigkeitsgrad. Waehle 'easy', 'medium' oder 'hard'.");
+                throw new IllegalArgumentException(language.equals("de") ? "Ungueltiger Schwierigkeitsgrad. Waehle 'easy', 'medium' oder 'hard'." : "Invalid difficutly level. Choose 'easy', 'medium', or 'hard'.");
         }
     }
 
@@ -167,19 +166,40 @@ public int playerCounter = 0; //currentplayer
 
     //Start Game
     public void startGame(){
+        // Wenn keine Sprache gewählt wird, wiederholt sich die Sprachabfrage.
+        String langChoice = "";
+        while (langChoice.isEmpty()) {
+            System.out.println("Choose a language / Waehle eine Sprache aus (en/de):");
+            langChoice = inputScanner.nextLine().trim().toLowerCase();
+        }
 
-        System.out.println("Welcome to Hangman!");
-        System.out.println("Player 1 Please enter your name: ");
-        player1.setName(inputScanner.nextLine());
-        System.out.println("Player 2 Please enter your name: ");
-        player2.setName(inputScanner.nextLine());
-        System.out.println("Hi "
-                            + player1.getName()
-                            +" & "
-                            + player2.getName()
-                            + "! Welcome to this game of Hangman Legends! ");
-        System.out.println("The Word u will be looking for is " + puzzleArray.length + " characters long. ");
-        System.out.println("Good Luck!\n" );
+        if (langChoice.equals("de")) {
+            language = "de";
+        } else {
+            language = "en";
+        }
+
+        System.out.println(language.equals("de") ? "Willkommen zu Hangman!" : "Welcome to Hangman!");
+        System.out.println(language.equals("de") ? "Gib die Anzahl der Spieler ein: " : "Enter the number of players: ");
+        int playerCount = Integer.parseInt(inputScanner.nextLine());
+        for (int i = 0; i < playerCount; i++) {
+            System.out.printf(language.equals("de") ? "Spieler %d, bitte gib deinen Namen ein: " : "Player %d, please enter your name: ", i + 1);
+            String playerName = inputScanner.nextLine().trim();
+            playerList.add(new PlayerHangman(playerName));
+        }
+
+        System.out.print(language.equals("de") ? "Hallo " : "Hi ");
+        for (int i = 0; i < playerList.size(); i++) {
+            System.out.print(playerList.get(i).getName());
+            if (i < playerList.size() - 2) {
+                System.out.print(", ");
+            } else if (i == playerList.size() - 2) {
+                System.out.print(" & ");
+            }
+        }
+        System.out.println(language.equals("de") ? "! Willkommen zum Spiel Hangman Legends!" : "! Welcome to this game of Hangman Legends!");
+        System.out.println(language.equals("de") ? "Das Wort, das ihr erraten muesst, hat " + puzzleArray.length + " Buchstaben." : "The Word u will be looking for is " + puzzleArray.length + " characters long. ");
+        System.out.println(language.equals("de") ? "Viel Glueck!\n" : "Good Luck!\n" );
 
     }
 
@@ -188,25 +208,25 @@ public int playerCounter = 0; //currentplayer
         boolean hasWon = false;
 
         while (!hasWon) {
-            PlayerHangman activePlayer = playerList[playerCounter];
-            System.out.println("It's your turn " + activePlayer.getName() + "!");
-            System.out.println("This is the current playing field:");
+            PlayerHangman activePlayer = playerList.get(currentPlayerIndex);
+            System.out.println(language.equals("de") ? "Du bist an der Reihe " + activePlayer.getName() + "!" : "It's your turn " + activePlayer.getName() + "!");
+            System.out.println(language.equals("de") ? "Dies ist das aktuelle Spielfeld:" : "This is the current playing field:");
             this.printPuzzleArray();
 
             // Take input and validate if input was given
             String guessString = inputScanner.nextLine().trim();
             while (guessString.isEmpty()) {
-                System.out.println("Invalid input. Please enter a letter:");
+                System.out.println(language.equals("de") ? "Ungueltige Eingabe. Bitte gib einen Buchstaben ein." : "Invalid input. Please enter a letter:");
                 guessString = inputScanner.nextLine().trim();
             }
             char guess = guessString.charAt(0);
 
             // Check if the letter was already guessed
             while (this.guessedAlready(guess)) {
-                System.out.println("You already guessed this letter, try again!");
+                System.out.println(language.equals("de") ? "Du hast diesen Buchstaben bereits geraten. Versuche es erneut!" : "You already guessed this letter, try again!");
                 guessString = inputScanner.nextLine().trim();
                 while (guessString.isEmpty()) {
-                    System.out.println("Invalid input. Please enter a letter:");
+                    System.out.println(language.equals("de") ? "Ungueltige Eingabe. Bitte gib einen Buchstaben ein." : "Invalid input. Please enter a letter:");
                     guessString = inputScanner.nextLine().trim();
                 }
                 guess = guessString.charAt(0);
@@ -218,15 +238,14 @@ public int playerCounter = 0; //currentplayer
                 this.printPuzzleArray();
                 if (this.checkIfWon()) {
                     hasWon = true;
-                    System.out.println("Congrats " + activePlayer.getName() + "! You won!");
+                    System.out.println(language.equals("de") ? "Glueckwunsch " +activePlayer.getName() + "! Du hast gewonnen!" : "Congrats " + activePlayer.getName() + "! You won!");
                 }
             } else {
                 if (activePlayer.reduceLives()) {
-                    System.out.println("Wrong! You have lost a life! You have "
-                            + activePlayer.getLives() + " remaining.");
-                    this.playerCounter = (this.playerCounter + 1) % 2; // Switch to the next player
+                    System.out.println(language.equals("de") ? "Falsch! Du hast ein Leben verloren! Du hast noch " + activePlayer.getLives() + " Leben uebrig." : "Wrong! You have lost a life! You have " + activePlayer.getLives() + " lifes remaining.");
+                    this.currentPlayerIndex = (this.currentPlayerIndex + 1) % playerList.size();
                 } else {
-                    System.out.println("Sorry " + activePlayer.getName() + "! You lost!");
+                    System.out.println(language.equals("de") ? "Schade " + activePlayer.getName() + "! Du hast verloren!" : "Sorry " + activePlayer.getName() + "! You lost!");
                     break; // Exit the game loop
                 }
             }
@@ -264,10 +283,10 @@ public int playerCounter = 0; //currentplayer
         PlayerHangman winner = null;
         int highestScore = Integer.MIN_VALUE;
         boolean tie = false;
-        System.out.println("Scores ");
+        System.out.println(language.equals("de") ? "Punkte " : "Scores ");
         for (PlayerHangman player : playerList) {
             int score = calculateScore(player);
-            System.out.println("Player " + player.getName() + " score is " + score);
+            System.out.println(language.equals("de") ? "Spieler " + player.getName() + " hat " + score + " Punkte." : "Player " + player.getName() + " score is " + score);
             if (score > highestScore) {
                 highestScore = score;
                 winner = player;
@@ -277,16 +296,16 @@ public int playerCounter = 0; //currentplayer
             }
         }
         if (tie) {
-            System.out.println("Untentschieden mit " + highestScore + " Punkten!");
+            System.out.println(language.equals("de") ? "Untentschieden mit " + highestScore + " Punkten!" : "Draw with " + highestScore + " Points!");
             for (PlayerHangman player : playerList) {
                 if (calculateScore(player) == highestScore) {
                     System.out.println(player.getName());
                 }
             }
         } else if (winner != null) {
-            System.out.println("Der Gewinner ist " + winner.getName() + " mit " + highestScore + " Punkten!");
+            System.out.println(language.equals("de") ? "Der Gewinner ist " + winner.getName() + " mit " + highestScore + " Punkten!" : "The Winner is " + winner.getName() + " with " + highestScore + " Points!");
         } else {
-            System.out.println("Es gibt keinen Gewinner!");
+            System.out.println(language.equals("de") ? "There is no winner!" : "Es gibt keinen Gewinner!");
         }
     }
 }
