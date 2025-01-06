@@ -117,7 +117,6 @@ private String language = "en"; // Standard Sprache ist Englisch
         }
         return true;
     }
-
     //Print the currentState of the Puzzle
     private void printPuzzleArray() {
         for (int i = 0; i < puzzleArray.length; i++) {
@@ -133,7 +132,6 @@ private String language = "en"; // Standard Sprache ist Englisch
 
         }
     }
-
     //Check where the letters are in the array
     private void updatePuzzleArray(char guess) {
         for (int i = 0; i < puzzleArray.length; i++) {
@@ -143,7 +141,6 @@ private String language = "en"; // Standard Sprache ist Englisch
         }
 
     }
-
     //Check if the guessed Letter is part of Word
     private boolean isPartOfWord(char letter) {
         for (int i = 0; i < wordArray.length; i++) {
@@ -153,7 +150,6 @@ private String language = "en"; // Standard Sprache ist Englisch
         }
         return false;
     }
-
     //Check if the guessed Letter was guessed already
     private boolean guessedAlready(char letter) {
         for (int i = 0; i < puzzleArray.length; i++) {
@@ -163,7 +159,6 @@ private String language = "en"; // Standard Sprache ist Englisch
         }
         return false;
     }
-
     //Start Game
     public void startGame(){
         // Wenn keine Sprache gewählt wird, wiederholt sich die Sprachabfrage.
@@ -202,7 +197,6 @@ private String language = "en"; // Standard Sprache ist Englisch
         System.out.println(language.equals("de") ? "Viel Glueck!\n" : "Good Luck!\n" );
 
     }
-
     //Loop to Play Rounds (main game Logic)
     public void playRound() {
         boolean hasWon = false;
