@@ -5,16 +5,15 @@ import java.util.Scanner;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Random;
 
-public class Hangman {
+public class HangmanGame {
 public Scanner inputScanner = new Scanner(System.in);
 private char[] puzzleArray; //current state of fields
 private char[] wordArray; //word to guess
 private String language = "en"; // Standard Sprache ist Englisch
 
     // Liste der Spieler, die am Spieler teilnehmen
-    private ArrayList<PlayerHangman> playerList = new ArrayList<>();
+    private ArrayList<HangmanPlayer> playerList = new ArrayList<>();
     private int currentPlayerIndex = 0;  //Spielerindex
     private String difficulty; //Schwierigkeitsgrad des Spiels
 
@@ -22,7 +21,7 @@ private String language = "en"; // Standard Sprache ist Englisch
 
 
     //Konstructor
-    public Hangman(int playerCount, String difficulty) {
+    public HangmanGame(int playerCount, String difficulty) {
         // Überprüfen der Spieleranzahl
         if(playerCount < 1 || playerCount > MAX_PLAYERS){
             throw new IllegalArgumentException("Die Spieleranzahl muss zwischen 1 und " + MAX_PLAYERS + "liegen");
@@ -35,7 +34,7 @@ private String language = "en"; // Standard Sprache ist Englisch
                 System.out.print("Spieler" + (i + 1) + ", bitte gib deinen Namen ein: ");
                 playerName = inputScanner.nextLine().trim();
             }while(playerName.isEmpty());
-            playerList.add(new PlayerHangman(playerName));
+            playerList.add(new HangmanPlayer(playerName));
 
         }
 
@@ -123,7 +122,7 @@ private String language = "en"; // Standard Sprache ist Englisch
         boolean hasWon = false;
 
         while (!hasWon) {
-            PlayerHangman activePlayer = playerList.get(currentPlayerIndex);
+            HangmanPlayer activePlayer = playerList.get(currentPlayerIndex);
             System.out.println(language.equals("de") ? "Du bist an der Reihe " + activePlayer.getName() + "!" : "It's your turn " + activePlayer.getName() + "!");
             System.out.println(language.equals("de") ? "Dies ist das aktuelle Spielfeld:" : "This is the current playing field:");
             this.printPuzzleArray();
@@ -249,7 +248,7 @@ private String language = "en"; // Standard Sprache ist Englisch
         Verloren - 9pts
         nur eine Grundbasis kann geändert werden mit einem schwierigkeitsmultiplikator
      */
-    public int calculateScore(PlayerHangman player) { //generelle Punkte"logik"
+    public int calculateScore(HangmanPlayer player) { //generelle Punkte"logik"
         if (!checkIfWon()) {
             return 9;
         }
@@ -266,12 +265,12 @@ private String language = "en"; // Standard Sprache ist Englisch
         }
     }
     public void calculateScoreAll(){ //Logik um die Punkte für alle Spieler zu berechnen
-        PlayerHangman winner = null;
+        HangmanPlayer winner = null;
         int highestScore = Integer.MIN_VALUE;
         boolean tie = false;
 
         System.out.println(language.equals("de") ? "Punkte:" : "Scores:");
-        for (PlayerHangman player : playerList) {
+        for (HangmanPlayer player : playerList) {
             int score = calculateScore(player);
             System.out.println(language.equals("de") ? "Spieler " + player.getName() + " hat " + score + " Punkte." : "Player " + player.getName() + " score is " + score);
             if (score > highestScore) {
@@ -284,7 +283,7 @@ private String language = "en"; // Standard Sprache ist Englisch
         }
         if (tie) {
             System.out.println(language.equals("de") ? "Unentschieden mit " + highestScore + " Punkten!" : "Draw with " + highestScore + " Points!");
-            for (PlayerHangman player : playerList) {
+            for (HangmanPlayer player : playerList) {
                 if (calculateScore(player) == highestScore) {
                     System.out.println(player.getName());
                 }

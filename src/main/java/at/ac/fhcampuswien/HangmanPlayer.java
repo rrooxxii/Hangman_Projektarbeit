@@ -2,9 +2,7 @@
 package at.ac.fhcampuswien;
 
 
-import java.util.Scanner;
-
-public class PlayerHangman {
+public class HangmanPlayer {
 
     private static final int MAX_LIVES = 7;
     private int lives = MAX_LIVES;
@@ -12,7 +10,7 @@ public class PlayerHangman {
 
 //Constructor
 
-    public PlayerHangman(String name) {
+    public HangmanPlayer(String name) {
         this.setName(name);
     }
 
