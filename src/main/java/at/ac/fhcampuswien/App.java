@@ -9,12 +9,20 @@ import java.io.IOException;
 public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("hangman-View.fxml"));
-        Scene scene = new Scene(fxmlLoader.load(), 1200, 800);
+        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("hangman-StartView.fxml"));
+        System.out.println("Instantiating Singleton");
+        fxmlLoader.setController(new HangmanController().getInstanceSingletonController());
+        System.out.println("Trying to set Scene");
+        Scene scene = new Scene(fxmlLoader.load());
+        System.out.println("Trying to set Title");
         stage.setTitle("Hangman 3000");
+
         stage.setResizable(false);
+        System.out.println("Trying to bin Scene to stage");
 
         stage.setScene(scene);
+        System.out.println("Trying to show Stage");
+
         stage.show();
     }
 
