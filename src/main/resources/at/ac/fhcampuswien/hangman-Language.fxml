@@ -9,6 +9,8 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
 
 <VBox maxHeight="400.0" maxWidth="600.0" minHeight="400.0" minWidth="600.0" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1">
    <children>
@@ -41,7 +43,28 @@
                   <Image url="@WELCOMETO%20HANGMAN3000.png" />
                </image>
             </ImageView>
-            <Button fx:id="startButton" layoutX="261.0" layoutY="279.0" mnemonicParsing="false" onAction="#goToSetLanguage" text="Start Game" />
+            <Text fx:id="ChooseLanguageText" fill="#ffe25e" layoutX="222.0" layoutY="214.0" stroke="#ffd296" strokeType="OUTSIDE" strokeWidth="0.4" text="Choose Word Language" AnchorPane.topAnchor="238.53125">
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Text>
+            <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+               <children>
+                  <Button fx:id="english" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#setLanguage" text="English" textAlignment="CENTER">
+                     <VBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </VBox.margin>
+                  </Button>
+                  <Button fx:id="german" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#setLanguage" text="Deutsch" textAlignment="CENTER">
+                     <VBox.margin>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </VBox.margin>
+                  </Button>
+               </children>
+               <padding>
+                  <Insets top="230.0" />
+               </padding>
+            </VBox>
          </children>
       </AnchorPane>
    </children>

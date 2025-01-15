@@ -15,12 +15,12 @@ public class HangmanController {
 
     //The Singleton Controller
     private static HangmanController gameController;
+    //GameInstanz
+    private HangmanGame currentHangmanGame;
     //ViewHandling
     private Stage currentStage;
     private Scene currentScene;
     private Parent currentRoot;
-    //GameInstanz
-    private HangmanGame currentHangmanGame;
     //View-States
     private String currentLanguageString;
     private String setlanguageButtonString;
@@ -29,26 +29,15 @@ public class HangmanController {
     private String setDifficultyButtonString;
 
     //FXML Bindings
-    @FXML
-    private Text currentLanguage = new Text("Test");
-    @FXML
-    private Button setLanguageButton = new Button();
-    @FXML
-    private Button startGameButton = new Button();
-    @FXML
-    private Button setDifficultyButton = new Button();
-    @FXML
-    private Text levelText = new Text("Level: ");
+
 
 
     //Constructor
     protected HangmanController() {
-
-        System.out.println("Trying to create ControllerHangman");
         HangmanGame newHangman = new HangmanGame();
         this.currentHangmanGame = newHangman;
-        currentHangmanGame.setLanguage("en");
-        currentHangmanGame.setControllerHangman(this);
+        currentHangmanGame.setLanguage("english");
+        currentHangmanGame.setController(this);
         System.out.println(currentHangmanGame.toString());
         System.out.println("GameCreated");
 
@@ -57,19 +46,14 @@ public class HangmanController {
     //Getter/Setter
 
     public HangmanController getInstanceSingletonController() {
-        System.out.println("Trying to get ControllerHangman instance");
         if (gameController == null) {
             gameController = new HangmanController();
         }
-        System.out.println("Trying to return ControllerHangman instance");
         return gameController;
     }
 
     //Methods
 
-    public void updateLanguageField(String language) {
-        this.currentLanguage.setText(language);
-    }
 
     public void switchScene(ActionEvent e, String fxmlFileString) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(HangmanController.class.getResource(fxmlFileString));
@@ -86,14 +70,56 @@ public class HangmanController {
     }
 
     @FXML
-    public void goToSetLanguage(ActionEvent e) throws IOException {
-        this.switchScene(e, "hangman-ChangeLanguage.fxml");
+    public void goToSetLanguage(ActionEvent e) throws IOException {     // 1st Step
+        this.currentHangmanGame = new HangmanGame();                    // Initialize GameObject
+        System.out.println(this.currentHangmanGame.toString());
+        this.switchScene(e, "hangman-Language.fxml");       // Go to 2nd Step
     }
 
     @FXML
-    public void goToSetDifficulty(ActionEvent e) throws IOException {
-        this.switchScene(e, "hangman-Level.fxml");
+    public void setLanguage(ActionEvent e) throws IOException {         // 2nd Step
+        Button button = (Button) e.getSource();                         // Get Button Id
+
+        try {                                                           // Set Language
+            if (button.getId().equals("german")) {
+            } else if (button.getId().equals("EnglishLanguage")) {
+            }
+        } catch (Exception exception) {
+            System.out.println(exception.toString());
+        } finally {
+            this.switchScene(e, "hangman-Difficulty.fxml"); // Go to 3rd Step
+
+        }
+
     }
+
+    @FXML
+    public void setDifficulty(ActionEvent e) throws IOException {       //3rd Step
+        Button button = (Button) e.getSource();                         // Get Button Id
+
+        try {                                                           // Set Difficulty
+            if (button.getId().equals("easy")) {
+
+            } else if (button.getId().equals("medium")) {
+
+            } else if (button.getId().equals("hard")) {
+
+            }
+        } catch (Exception exception) {
+            System.out.println(exception.toString());
+        } finally {
+            this.switchScene(e, "hangman-Player.fxml");     // Go to 4th Step
+
+        }
+
+    }
+
+    @FXML
+    public void setPlayer(ActionEvent e) throws IOException {           //4thrd Step
+
+        this.switchScene(e, "hangman-MainGame.fxml");
+    }
+
 
     @FXML
     public void goToGame(ActionEvent e) throws IOException {
@@ -101,38 +127,6 @@ public class HangmanController {
 
     }
 
-
-    @FXML
-    public void setLanguage(ActionEvent e) throws IOException {
-        Button button = (Button) e.getSource();
-
-        try {
-            if (button.getId().equals("GermanLanguage")) {
-                this.currentLanguageString = "Derzeitige Sprache: Deutsch";
-                this.setlanguageButtonString = "Sprache Ändern";
-                this.startGameButtonString = "Spiel starten";
-                this.currentHangmanGame.setLanguage("de");
-
-
-            } else if (button.getId().equals("EnglishLanguage")) {
-                this.currentLanguageString = "Current Language: English";
-                this.setlanguageButtonString = "Change Language";
-                this.startGameButtonString = "Start Game";
-                this.currentHangmanGame.setLanguage("en");
-
-            }
-
-        } catch (Exception exception) {
-            System.out.println(exception.toString());
-        } finally {
-            this.switchScene(e, "hangman-StartView.fxml");
-            this.currentLanguage.setText(this.currentLanguageString);
-            this.setLanguageButton.setText(this.setlanguageButtonString);
-            this.startGameButton.setText(this.startGameButtonString);
-            this.setDifficultyButton.setText(this.setDifficultyString);
-        }
-
-    }
     /*
     @FXML
     public void setDifficulty(ActionEvent e) throws IOException {

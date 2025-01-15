@@ -7,6 +7,7 @@ public class HangmanPlayer {
     private static final int MAX_LIVES = 7;
     private int lives = MAX_LIVES;
     private  String name = null;
+    private int guessCount;
 
 //Constructor
 
