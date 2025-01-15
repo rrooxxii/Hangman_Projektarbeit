@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import java.io.IOException;
@@ -21,15 +22,17 @@ public class HangmanController {
     private Stage currentStage;
     private Scene currentScene;
     private Parent currentRoot;
-    //View-States
-    private String currentLanguageString;
-    private String setlanguageButtonString;
-    private String startGameButtonString;
-    private String setDifficultyString;
-    private String setDifficultyButtonString;
-
     //FXML Bindings
-
+    @FXML
+    private TextField playerNumberField;
+    @FXML
+    private Text PlayerNumberText;
+    @FXML
+    private TextField playerNameField;
+    @FXML
+    private Text playerNameText;
+    //Hilfscounter
+    private int counter = 0;
 
 
     //Constructor
@@ -65,92 +68,74 @@ public class HangmanController {
         currentStage.show();
     }
 
-    public void updateElements () {
 
-    }
 
     @FXML
-    public void goToSetLanguage(ActionEvent e) throws IOException {     // 1st Step
+    public void pressStart(ActionEvent e) throws IOException {
         this.currentHangmanGame = new HangmanGame();                    // Initialize GameObject
         System.out.println(this.currentHangmanGame.toString());
         this.switchScene(e, "hangman-Language.fxml");       // Go to 2nd Step
-    }
+    }   // 1st Step
 
     @FXML
-    public void setLanguage(ActionEvent e) throws IOException {         // 2nd Step
-        Button button = (Button) e.getSource();                         // Get Button Id
+    public void setLanguage(ActionEvent e) throws IOException {
+        Button button = (Button) e.getSource();                         // Set Language
+        this.currentHangmanGame.setLanguage((String) button.getId());
+        this.switchScene(e, "hangman-Difficulty.fxml");     // Go to 3rd Step
+    }   // 2nd Step
 
-        try {                                                           // Set Language
-            if (button.getId().equals("german")) {
-            } else if (button.getId().equals("EnglishLanguage")) {
-            }
-        } catch (Exception exception) {
-            System.out.println(exception.toString());
-        } finally {
-            this.switchScene(e, "hangman-Difficulty.fxml"); // Go to 3rd Step
-
-        }
-
-    }
-
-    @FXML
-    public void setDifficulty(ActionEvent e) throws IOException {       //3rd Step
-        Button button = (Button) e.getSource();                         // Get Button Id
-
-        try {                                                           // Set Difficulty
-            if (button.getId().equals("easy")) {
-
-            } else if (button.getId().equals("medium")) {
-
-            } else if (button.getId().equals("hard")) {
-
-            }
-        } catch (Exception exception) {
-            System.out.println(exception.toString());
-        } finally {
-            this.switchScene(e, "hangman-Player.fxml");     // Go to 4th Step
-
-        }
-
-    }
-
-    @FXML
-    public void setPlayer(ActionEvent e) throws IOException {           //4thrd Step
-
-        this.switchScene(e, "hangman-MainGame.fxml");
-    }
-
-
-    @FXML
-    public void goToGame(ActionEvent e) throws IOException {
-        this.switchScene(e, "hangman-MainGame.fxml");
-
-    }
-
-    /*
     @FXML
     public void setDifficulty(ActionEvent e) throws IOException {
+        Button button = (Button) e.getSource();                         // Set Language
+        this.currentHangmanGame.setDifficulty((String) button.getId());
+        this.switchScene(e, "hangman-Player.fxml");         // Go to 4th Step
 
-        Button button = (Button) e.getSource();
-        try {
-            if (button.getId().equals("LevelEasy")) {
-                this.setDifficultyString = "Easy";
-            } else if (button.getId().equals("LevelMedium")) {
-                this.setDifficultyString = "Medium";
-            } else if (button.getId().equals("LevelHard")) {
-                this.setDifficultyString = "Hard";
-            }
-        } catch (Exception exception) {
-            System.out.println(exception.toString());
-        } finally {
-            this.switchScene(e, "hangman-StartView.fxml");
-            this.levelText.setText("Level: " + this.setDifficultyString);
-        }
-    }
-    */
+    }   //3rd Step
+
     @FXML
-    public void goToStartGame(ActionEvent e) throws IOException {
-        this.switchScene( e, "hangman-MainGame.fxml");
-    }
+    public void setPlayer(ActionEvent e) throws IOException {
+        String input = playerNumberField.getText();
+        try {
+            int playerNumber = Integer.parseInt(input);
+            if (playerNumber >= 1 && playerNumber <= 4) {
+                currentHangmanGame.setPlayerNumber(playerNumber);       //Initialize PlayerArray if possible
+                currentHangmanGame.initPlayerArray();
+                this.switchScene(e, "hangman-Name.fxml");         // Go to 5th Step
+            } else {
+                playerNumberField.clear();
+                PlayerNumberText.setText("The number is not between 1 and 4.");
+                PlayerNumberText.setLayoutX(180);
+                System.out.println("The number is not between 1 and 4.");
+            }
+        } catch (NumberFormatException ex) {
+            playerNumberField.clear();
+            PlayerNumberText.setText("Please enter a number between 1 and 4");
+            PlayerNumberText.setLayoutX(166);
+            System.out.println("Please enter a number between 1 and 4.");
+        }
+    }   //4th Step
+
+
+    @FXML
+    public void setPlayerName(ActionEvent e) throws IOException {
+        String name = playerNameField.getText();
+
+        if (playerNameField.getText().length() == 0) {
+            playerNameText.setText("Please enter a name");
+            return;
+        } else {
+            currentHangmanGame.getPlayers()[counter] = new HangmanPlayer(name);
+            System.out.println("Player "+ (int) (counter+1) + "initialized");
+            playerNameField.clear();
+
+            counter ++;
+        }
+        if (counter ==currentHangmanGame.getPlayerNumber()) {
+            this.switchScene(e, "hangman-MainGame.fxml");         // Go to 5th Step
+        } else {
+            playerNameText.setText("Player "+ (int) (counter+1) +", choose a Name!");
+        }
+
+    }   //5th Step
 
 }

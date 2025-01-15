@@ -1,10 +1,4 @@
 package at.ac.fhcampuswien;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Scanner;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
 public class HangmanGame {
 
@@ -18,7 +12,7 @@ public class HangmanGame {
     private HangmanPlayer[] players;
     private String language;
     private String difficulty;
-    private int numberPlayer;
+    private int playerNumber;
 
     //Constructor
     //Getter/Setter
@@ -26,17 +20,34 @@ public class HangmanGame {
         this.controller = controller;
     }
     public void setLanguage(String language) {
-        if (language.equals("english") || language.equals("deutsch")) {
+        if (language.equals("english") || language.equals("german")) {
             this.language = language;
+            System.out.println("Language set to " + language);
         } else {
             System.out.println("Language not recognised");
         }
     }
+    public void setDifficulty(String difficulty) {
+        if (difficulty.equals("easy") || difficulty.equals("medium") || difficulty.equals("hard")) {
+            this.difficulty = difficulty;
+            System.out.println("Difficulty set to " + difficulty);
+        } else {
+            System.out.println("Difficulty not recognised");
+        }
+
+    }
+    public void setPlayerNumber(int playerNumber) {
+        this.playerNumber = playerNumber;
+    }
+    public int getPlayerNumber() {
+        return playerNumber;
+    }
+    public HangmanPlayer[] getPlayers() {
+        return players;
+    }
 
     //Methods
         //Initializers
-    public void initPlayerArray () {
-    } //Store Players
     public void initPuzzleArray () {
         puzzleArray = new char[wordArray.length];
         for (int i = 0; i < puzzleArray.length; i++) {
@@ -50,7 +61,11 @@ public class HangmanGame {
         }
         System.out.println();
     } // Print Array
+    public void initPlayerArray () {
+        players = new HangmanPlayer[playerNumber];
+        System.out.println("PlayerArray initialized to size " + playerNumber );
 
+    }
 
 
 }

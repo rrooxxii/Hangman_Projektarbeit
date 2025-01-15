@@ -41,7 +41,7 @@
                   <Image url="@WELCOMETO%20HANGMAN3000.png" />
                </image>
             </ImageView>
-            <Button fx:id="startButton" layoutX="261.0" layoutY="279.0" mnemonicParsing="false" onAction="#goToSetLanguage" text="Start Game" />
+            <Button fx:id="startButton" layoutX="261.0" layoutY="279.0" mnemonicParsing="false" onAction="#pressStart" text="Start Game" />
          </children>
       </AnchorPane>
    </children>
