@@ -60,7 +60,7 @@
                   <Insets top="245.0" />
                </padding>
             </VBox>
-            <Text fx:id="setPlayerNumberText" fill="#ffe25e" layoutX="236.0" layoutY="254.5" stroke="#ffd296" strokeType="OUTSIDE" strokeWidth="0.4" text="Number of Players" AnchorPane.topAnchor="238.5">
+            <Text fx:id="PlayerNumberText" fill="#ffe25e" layoutX="236.0" layoutY="254.5" stroke="#ffd296" strokeType="OUTSIDE" strokeWidth="0.4" text="Number of Players" AnchorPane.topAnchor="238.5">
                <font>
                   <Font size="16.0" />
                </font>
