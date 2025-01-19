@@ -7,6 +7,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -31,8 +32,17 @@ public class HangmanController {
     private TextField playerNameField;
     @FXML
     private Text playerNameText;
+    @FXML
+    private Label puzzleLabel; //Label, um das aktuelle Puzzle darzustellen
+    @FXML
+    private Label playerInfoLabel; //Label, um Spielerinformationen anzuzeigen
+    @FXML
+    private TextField letterInputField; //Eingabefeld für Buchstaben
+    @FXML
+    private Label feedbackLabel;  //Label, um Rückmeldungen anzuzeigen
     //Hilfscounter
     private int counter = 0;
+
 
 
     //Constructor
@@ -46,9 +56,8 @@ public class HangmanController {
 
     }
 
-    //Getter/Setter
 
-    public HangmanController getInstanceSingletonController() {
+    public static HangmanController getInstanceSingletonController() {
         if (gameController == null) {
             gameController = new HangmanController();
         }
@@ -62,12 +71,76 @@ public class HangmanController {
         FXMLLoader fxmlLoader = new FXMLLoader(HangmanController.class.getResource(fxmlFileString));
         fxmlLoader.setController(gameController); // Reuse the same controller
         currentRoot = fxmlLoader.load();
-        currentStage = (Stage)((Node)e.getSource()).getScene().getWindow();
+        currentStage = (Stage) ((Node) e.getSource()).getScene().getWindow();
         currentScene = new Scene(currentRoot);
         currentStage.setScene(currentScene);
         currentStage.show();
     }
 
+    @FXML
+    public void initialize() {
+        try {
+            // Schwierigkeitsgrad ist ein Beispiel, später dynamisch vom Benutzer festlegen
+            currentHangmanGame.setDifficulty("easy");
+            currentHangmanGame.initPuzzleArray();
+            updateGameDisplay();
+        } catch (Exception e) {
+            feedbackLabel.setText("Error initializing game: " + e.getMessage());
+        }
+    }
+
+    private void updateGameDisplay() {
+        //Update puzzle
+        puzzleLabel.setText(String.valueOf(currentHangmanGame.getPuzzleArray()));
+        //Uppdate player info
+        HangmanPlayer currentPlayer = currentHangmanGame.getCurrentPlayer();
+        playerInfoLabel.setText("Player: " + currentPlayer.getName() + ", Lives: " + currentPlayer.getLives());
+    }
+
+    @FXML
+    public void guessLetter(ActionEvent e) {
+        String input = letterInputField.getText().toLowerCase().trim();
+        if (input.length() != 1 || !Character.isLetter(input.charAt(0))) {
+            feedbackLabel.setText("Invalid input. Enter a single letter.");
+            return;
+        }
+
+        char guessedLetter = input.charAt(0);
+        boolean isCorrect = currentHangmanGame.guessLetter(guessedLetter);
+
+        if (isCorrect) {
+            feedbackLabel.setText("Correct Guess");
+        } else {
+            feedbackLabel.setText("Wrong guess!");
+            currentHangmanGame.getCurrentPlayer().reduceLives();
+        }
+
+        updateGameDisplay();
+
+        if (isGameOver()) {
+            feedbackLabel.setText("Game Over! The word was: " + String.valueOf(currentHangmanGame.getWordArray()));
+            return;
+        }
+
+        currentHangmanGame.switchToNextPlayer();
+        updateGameDisplay();
+
+        letterInputField.clear();
+
+    }
+
+    private boolean isGameOver() {
+        for (HangmanPlayer player : currentHangmanGame.getPlayers()) {
+            if (player.getLives() > 0 && !isPuzzleSolved()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean isPuzzleSolved() {
+        return String.valueOf(currentHangmanGame.getPuzzleArray()).equals(String.valueOf(currentHangmanGame.getWordArray()));
+    }
 
 
     @FXML
@@ -93,27 +166,28 @@ public class HangmanController {
     }   //3rd Step
 
     @FXML
-    public void setPlayer(ActionEvent e) throws IOException {
-        String input = playerNumberField.getText();
+    public void setPlayers(ActionEvent e) throws IOException {
+        int playerNumber;
         try {
-            int playerNumber = Integer.parseInt(input);
-            if (playerNumber >= 1 && playerNumber <= 4) {
-                currentHangmanGame.setPlayerNumber(playerNumber);       //Initialize PlayerArray if possible
-                currentHangmanGame.initPlayerArray();
-                this.switchScene(e, "hangman-Name.fxml");         // Go to 5th Step
-            } else {
-                playerNumberField.clear();
-                PlayerNumberText.setText("The number is not between 1 and 4.");
-                PlayerNumberText.setLayoutX(180);
-                System.out.println("The number is not between 1 and 4.");
+            playerNumber = Integer.parseInt(playerNumberField.getText().trim());
+            if (playerNumber < 1 || playerNumber > 4) {
+                feedbackLabel.setText("Please enter a number between 1 and 4.");
+                return;
             }
         } catch (NumberFormatException ex) {
-            playerNumberField.clear();
-            PlayerNumberText.setText("Please enter a number between 1 and 4");
-            PlayerNumberText.setLayoutX(166);
-            System.out.println("Please enter a number between 1 and 4.");
+            feedbackLabel.setText("Invalid number. Please enter a number between 1 and 4.");
+            return;
         }
-    }   //4th Step
+
+        currentHangmanGame.setPlayerNumber(playerNumber);
+        String[] playerNames = new String[playerNumber];
+        for (int i = 0; i < playerNumber; i++) {
+            playerNames[i] = "Player " + (i + 1); // Standardnamen oder Eingabe durch Benutzer
+        }
+        currentHangmanGame.initPlayerArray(playerNames);
+
+        this.switchScene(e, "hangman-MainGame.fxml");
+    }//4th Step
 
 
     @FXML
@@ -125,17 +199,18 @@ public class HangmanController {
             return;
         } else {
             currentHangmanGame.getPlayers()[counter] = new HangmanPlayer(name);
-            System.out.println("Player "+ (int) (counter+1) + "initialized");
+            System.out.println("Player " + (int) (counter + 1) + "initialized");
             playerNameField.clear();
 
-            counter ++;
+            counter++;
         }
-        if (counter ==currentHangmanGame.getPlayerNumber()) {
-            this.switchScene(e, "hangman-MainGame.fxml");         // Go to 5th Step
+        if (counter == currentHangmanGame.getPlayerNumber()) {
+            this.switchScene(e, "hangman-MainGame.fxml");         // Go to 5th Step (Game Scene)
         } else {
-            playerNameText.setText("Player "+ (int) (counter+1) +", choose a Name!");
+            playerNameText.setText("Player " + (int) (counter + 1) + ", choose a Name!");
         }
 
-    }   //5th Step
-
+    }
 }
+
+

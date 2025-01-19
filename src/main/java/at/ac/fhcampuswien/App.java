@@ -9,9 +9,17 @@ import java.io.IOException;
 public class App extends Application {
     @Override
     public void start(Stage stage) throws IOException {
+        //Lade Startszene
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("hangman-StartView.fxml"));
+
+        //Setze den Singleton-Controller
+        HangmanController controller = HangmanController.getInstanceSingletonController();
+        fxmlLoader.setController(controller);
         System.out.println("Instantiating Singleton");
-        fxmlLoader.setController(new HangmanController().getInstanceSingletonController());
+
+
+        // Setze Eigenschaften für das Hauptfenster
+        //fxmlLoader.setController(new HangmanController().getInstanceSingletonController());
         System.out.println("Trying to set Scene");
         Scene scene = new Scene(fxmlLoader.load());
         System.out.println("Trying to set Title");
