@@ -77,17 +77,17 @@ public class HangmanController {
         currentStage.show();
     }
 
-    @FXML
-    public void initialize() {
-        try {
-            // Schwierigkeitsgrad ist ein Beispiel, später dynamisch vom Benutzer festlegen
-            currentHangmanGame.setDifficulty("easy");
-            currentHangmanGame.initPuzzleArray();
-            updateGameDisplay();
-        } catch (Exception e) {
-            feedbackLabel.setText("Error initializing game: " + e.getMessage());
-        }
-    }
+//    @FXML
+//    public void initialize() {
+//        try {
+//            // Schwierigkeitsgrad ist ein Beispiel, später dynamisch vom Benutzer festlegen
+//            currentHangmanGame.setDifficulty("easy");
+//            currentHangmanGame.initPuzzleArray();
+//            updateGameDisplay();
+//        } catch (Exception e) {
+//            feedbackLabel.setText("Error initializing game: " + e.getMessage());
+//        }
+//    }
 
     private void updateGameDisplay() {
         //Update puzzle

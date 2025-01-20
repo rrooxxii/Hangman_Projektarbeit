@@ -56,7 +56,7 @@
                     </HBox>
 
                     <!-- Feedback -->
-                    <Label fx:id="feedbackLabel" text="Guess a letter!" style="-fx-font-size: 14px; -fx-text-fill: lightgray;" />
+                    <Label fx:id="" text="Guess a letter!" style="-fx-font-size: 14px; -fx-text-fill: lightgray;" />
                 </VBox>
             </children>
         </AnchorPane>

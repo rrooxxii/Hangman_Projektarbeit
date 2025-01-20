@@ -24,21 +24,28 @@ public class HangmanGame {
     public String fetchWordFromAPI(String difficulty) throws Exception {
         HttpClient client = HttpClient.newHttpClient();
         String apiUrl = buildApiUrl(difficulty);
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(new URI(apiUrl))
-                .GET()
-                .build();
+        System.out.println("Requesting word from API: " + apiUrl);
 
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        if (response.statusCode() == 200) {
-            String responseBody = response.body().substring(2, response.body().length() - 2); // Entferne JSON-Array-Formatierung
-            if (isWordValidForDifficulty(responseBody, difficulty)) {
-                return responseBody;
+        while (true) { // Wiederhole, bis ein gültiges Wort gefunden wird
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(new URI(apiUrl))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() == 200) {
+                // Entferne JSON-Array-Formatierung ["word"]
+                String word = response.body().substring(2, response.body().length() - 2);
+                if (isWordValidForDifficulty(word, difficulty)) {
+                    System.out.println("Valid word found: " + word);
+                    return word;
+                } else {
+                    System.out.println("Word does not match difficulty. Retrying...");
+                }
             } else {
-                return fetchWordFromAPI(difficulty); // Wiederhole die Anfrage, falls Wort nicht passt
+                throw new RuntimeException("API request failed with status code: " + response.statusCode());
             }
-        } else {
-            throw new RuntimeException("API request failed with status code: " + response.statusCode());
         }
     }
 
@@ -57,18 +64,9 @@ public class HangmanGame {
     }
 
     private String buildApiUrl(String difficulty) {
-        String baseUrl = "https://random-word-api.herokuapp.com/word?number=1";
-        switch (difficulty.toLowerCase()) {
-            case "easy":
-                return baseUrl + "&minLength=1&maxLength=10";
-            case "medium":
-                return baseUrl + "&minLength=10&maxLength=15";
-            case "hard":
-                return baseUrl + "&minLength=15";
-            default:
-                throw new IllegalArgumentException("Invalid difficulty: " + difficulty);
+        return "https://random-word-api.herokuapp.com/word?number=1";
         }
-    }
+
 
     //Constructor
     //Getter/Setter
@@ -85,14 +83,15 @@ public class HangmanGame {
         }
     }
     public void setDifficulty(String difficulty) {
-
         this.difficulty = difficulty;
         try {
             String word = fetchWordFromAPI(difficulty);
             setWord(word);
             System.out.println("Word fetched from API: " + word);
         } catch (Exception e) {
-            throw new RuntimeException("Error fetching word from API: " + e.getMessage());
+            System.out.println("Error fetching word from API: " + e.getMessage());
+            setWord("default"); // Fallback-Wort
+            System.out.println("Using fallback word: default");
         }
 
 
